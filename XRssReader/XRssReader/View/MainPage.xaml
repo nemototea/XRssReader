@@ -1,0 +1,113 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:XRssReader"
+             x:Class="XRssReader.View.MainPage"
+             xmlns:vm="clr-namespace:XRssReader.ViewModel"
+             Title="XRssReader (prot.Cha'sMine)">
+    <ContentPage.BindingContext>
+        <vm:MainPageViewModel GetRSSCompleted="getRSSCompleted"/>
+    </ContentPage.BindingContext>
+    <ContentPage.Padding>
+        <OnPlatform x:TypeArguments="Thickness">
+            <On Platform="iOS" Value="5, 20, 5, 0" />
+            <On Platform="Android" Value="5, 0, 5, 0" />
+        </OnPlatform>
+    </ContentPage.Padding>
+
+    <!-- このxaml内のスタイルを一括指定したいときは以下のようにも書ける -->
+    <!-- ContentPage.Resources>
+        <ResourceDictionary>
+            <Style TargetType="Grid">
+                <Setter Property="RowSpacing" Value="2" />
+                <Setter Property="ColumnSpacing" Value="2" />
+            </Style>
+
+            <Style TargetType="Label">
+                <Setter Property="VerticalOptions" Value="Center" />
+                <Setter Property="HorizontalTextAlignment" Value="End" />
+            </Style>
+
+            <Style TargetType="Button">
+                <Setter Property="BorderWidth" Value="1" />
+                <Setter Property="BorderColor" Value="Black" />
+            </Style>
+        </ResourceDictionary>
+    </-->
+
+
+    <StackLayout>
+        <!-- Place new controls here -->
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- RSSフィードの配信元情報を表示します -->
+            <StackLayout Grid.Row="0" BackgroundColor="Black">
+                <Label Text="{Binding FeedTitle, TargetNullValue='No RSS Feed'}"
+				   FontSize="14" TextColor="Lime" Margin="3, 3"/>
+                <Label Text="{Binding FeedDescription}"
+                   FontSize="11" TextColor="White" Margin="3, 3"/>
+                <Label Text="{Binding FeedLastUpdatedTime, StringFormat='最終更新日 : {0:yyyy/MM/dd} {0:hh:mm:ss}'}"
+				   FontSize="10" TextColor="Yellow" Margin="3, 3"/>
+            </StackLayout>
+            
+            <!-- RSSフィードのコンテンツを表示します -->
+            <ListView x:Name="RSSListBox"
+                      Grid.Row="1"
+                      SeparatorColor="Lime"
+                      HasUnevenRows="True"
+                      ItemsSource="{Binding FeedItems}"
+                      BackgroundColor="Black" >
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ViewCell>
+                            <ViewCell.ContextActions>
+                                <MenuItem Text="Read more"
+                                          Command="{Binding LaunchLinkUriCommand}"
+                                          CommandParameter="{Binding Link}"/>
+                            </ViewCell.ContextActions>
+                            
+                            <StackLayout Orientation="Vertical"
+                                         Spacing="0"
+                                         Padding="15,10">
+                                <Image Source="{Binding Thumbnail}"
+                                       HeightRequest="150"
+                                       VerticalOptions="StartAndExpand"
+                                       Aspect="AspectFill" />
+
+                                <StackLayout>
+                                    <Label Text="{Binding Title}" FontSize="14"
+                                       LineBreakMode="WordWrap" TextColor="Lime" Margin="3,3,3,1"/>
+                                    <Label Text="{Binding PubDate, StringFormat='投稿日 : {0:yyyy/MM/dd} {0:hh:mm:ss}'}"
+                                       FontSize="10" LineBreakMode="WordWrap" TextColor="Yellow" Margin="3,3,3,2"/>
+                                    <Label Text="{Binding Description}" FontSize="12"
+                                       LineBreakMode="WordWrap" TextColor="White" Margin="3,3,3,2"/>
+                                </StackLayout>
+                            </StackLayout>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+
+            <Grid Grid.Row="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- URL入力ボックスと「更新」ボタンです -->
+                <Entry Grid.Column="0" Text="{Binding FeedUrl}" FontSize="14"
+                       BackgroundColor="Black" TextColor="White"/>
+                <Button Grid.Column="1" HorizontalOptions="End" FontSize="14"
+                        Text="更新" Command="{Binding GetRssCommand}"/>
+            </Grid>
+        </Grid>
+
+
+    </StackLayout>
+
+</ContentPage>
